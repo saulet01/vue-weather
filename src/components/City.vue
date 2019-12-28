@@ -71,9 +71,7 @@
         </v-container>
 
         <v-container>
-            <v-row>
-                <v-img alt="example" src="@/assets/example.jpg" max-width="400"></v-img>
-            </v-row>
+            <app-favorites></app-favorites>
         </v-container>
     </div>
 </template>
@@ -81,20 +79,18 @@
 <script>
     import Sunny from "./Sunny";
     import RainyComponent from "./Rainy";
-    import axios from "axios";
+    import Favorites from "./Favorites";
     import moment from "moment";
     export default {
         data() {
             return {
-                selectedComponent: "",
-                getCity: {},
-                searchNewCity: "",
-                errorCode: ""
+                searchNewCity: ""
             };
         },
         components: {
             "app-sunny": Sunny,
-            "app-rainy": RainyComponent
+            "app-rainy": RainyComponent,
+            "app-favorites": Favorites
         },
         methods: {
             geImgUrl() {
@@ -104,70 +100,27 @@
                 return getSource;
             },
             findNewCity() {
-                this.errorCode = "";
-                // eslint-disable-next-line no-console
-                console.log(this.searchNewCity);
-                axios
-                    .get(
-                        "http://api.openweathermap.org/data/2.5/weather?q=" +
-                            this.searchNewCity +
-                            "&APPID=686aeb1eff8cb88780f2fbb1b51b06f8&units=metric"
-                    )
-                    .then(res => {
-                        this.getCity = res.data;
-                        // eslint-disable-next-line no-console
-                        // console.log(res.data.weather[0].description);
-                        switch (res.data.weather[0].description) {
-                            case "rain":
-                            case "shower rain":
-                            case "thunderstorm":
-                            case "moderate rain":
-                            case "broken clouds":
-                                this.selectedComponent = "app-rainy";
-                                break;
-
-                            default:
-                                this.selectedComponent = "app-sunny";
-                                break;
-                        }
-                        // eslint-disable-next-line no-console
-                        console.log(this.selectedComponent);
-                    })
-                    .catch(error => {
-                        this.errorCode = error.response.data.cod;
-                        // eslint-disable-next-line no-console
-                        console.log(error.response.data.cod);
-                    });
+                this.$store.dispatch("findNewCity", this.searchNewCity);
             }
         },
         mounted() {
-            axios
-                .get(
-                    "http://api.openweathermap.org/data/2.5/weather?q=Barcelona&APPID=686aeb1eff8cb88780f2fbb1b51b06f8&units=metric"
-                )
-                .then(res => {
-                    this.getCity = res.data;
-                    switch (res.data.weather[0].description) {
-                        case "rain":
-                        case "shower rain":
-                        case "thunderstorm":
-                        case "moderate rain":
-                        case "broken clouds":
-                            this.selectedComponent = "app-rainy";
-                            break;
-
-                        default:
-                            this.selectedComponent = "app-sunny";
-                            break;
-                    }
-                });
+            this.$store.dispatch("findNewCity", "London");
         },
         computed: {
+            getCity() {
+                return this.$store.getters.getStaticCity;
+            },
+            selectedComponent() {
+                return this.$store.getters.getComponent;
+            },
             getTodayDate() {
                 return moment().format("LL");
             },
             getNameOfDay() {
                 return moment().format("dddd");
+            },
+            errorCode() {
+                return this.$store.getters.getErrorCode;
             }
         }
     };
