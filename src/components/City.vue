@@ -4,13 +4,7 @@
             <v-row>
                 <v-col cols="8" class="mx-auto">
                     <v-form class="d-flex align-center">
-                        <v-text-field
-                            label="Enter City"
-                            prepend-inner-icon="search"
-                            dark
-                            hint="For instance: New York"
-                            v-model="searchNewCity"
-                        ></v-text-field>
+                        <v-text-field label="Enter City" prepend-inner-icon="search" dark hint="For instance: New York" v-model="searchNewCity"></v-text-field>
                         <v-btn class="ml-3" v-on:click="findNewCity">Search</v-btn>
                     </v-form>
 
@@ -70,60 +64,59 @@
             </v-row>
         </v-container>
 
-        <v-container>
+        <v-container fluid>
             <app-favorites></app-favorites>
         </v-container>
+        <div class="mb-5"></div>
     </div>
 </template>
 
 <script>
-    import Sunny from "./Sunny";
-    import RainyComponent from "./Rainy";
-    import Favorites from "./Favorites";
-    import moment from "moment";
-    export default {
-        data() {
-            return {
-                searchNewCity: ""
-            };
+import Sunny from "./Sunny";
+import RainyComponent from "./Rainy";
+import Favorites from "./Favorites";
+import moment from "moment";
+export default {
+    data() {
+        return {
+            searchNewCity: ""
+        };
+    },
+    components: {
+        "app-sunny": Sunny,
+        "app-rainy": RainyComponent,
+        "app-favorites": Favorites
+    },
+    methods: {
+        geImgUrl() {
+            var getSource = require("../assets/flags/" + this.getCity.sys.country.toLowerCase() + ".png");
+            return getSource;
         },
-        components: {
-            "app-sunny": Sunny,
-            "app-rainy": RainyComponent,
-            "app-favorites": Favorites
-        },
-        methods: {
-            geImgUrl() {
-                var getSource = require("../assets/flags/" +
-                    this.getCity.sys.country.toLowerCase() +
-                    ".png");
-                return getSource;
-            },
-            findNewCity() {
-                this.$store.dispatch("findNewCity", this.searchNewCity);
-            }
-        },
-        mounted() {
-            this.$store.dispatch("findNewCity", "London");
-        },
-        computed: {
-            getCity() {
-                return this.$store.getters.getStaticCity;
-            },
-            selectedComponent() {
-                return this.$store.getters.getComponent;
-            },
-            getTodayDate() {
-                return moment().format("LL");
-            },
-            getNameOfDay() {
-                return moment().format("dddd");
-            },
-            errorCode() {
-                return this.$store.getters.getErrorCode;
-            }
+        findNewCity() {
+            this.$store.dispatch("findNewCity", this.searchNewCity);
         }
-    };
+    },
+    mounted() {
+        this.$store.dispatch("findNewCity", "Almaty");
+    },
+    computed: {
+        getCity() {
+            return this.$store.getters.getStaticCity;
+        },
+        selectedComponent() {
+            return this.$store.getters.getComponent;
+        },
+        getTodayDate() {
+            return moment().format("LL");
+        },
+        getNameOfDay() {
+            return moment().format("dddd");
+        },
+        errorCode() {
+            return this.$store.getters.getErrorCode;
+        }
+    }
+};
 </script>
 
 <style>
@@ -142,11 +135,7 @@
 
 .card-city {
     background-color: #abe9cd;
-    background-image: linear-gradient(
-        0deg,
-        rgba(171, 233, 205, 1) 0%,
-        rgba(62, 173, 207) 90%
-    );
+    background-image: linear-gradient(0deg, rgba(171, 233, 205, 1) 0%, rgba(62, 173, 207) 90%);
 }
 
 .img-thumbnail {

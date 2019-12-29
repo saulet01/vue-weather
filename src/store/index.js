@@ -9,7 +9,8 @@ export default new Vuex.Store({
   state: {
     selectedComponent: "",
     getCity: {},
-    errorCode: ""
+    errorCode: "",
+    worldCities: []
   },
   mutations: {
     SET_STATIC_CITY(state, res) {
@@ -27,6 +28,9 @@ export default new Vuex.Store({
           state.selectedComponent = "app-sunny";
           break;
       }
+    },
+    GET_WORLD_COUNTRIES(state, res) {
+      state.worldCities = res;
     }
   },
   actions: {
@@ -44,6 +48,26 @@ export default new Vuex.Store({
         .catch(error => {
           state.errorCode = error.response.data.cod;
         });
+    },
+    getGlobalCities({ commit }) {
+      let firstAPICall = fetch(
+        "http://api.openweathermap.org/data/2.5/weather?q=Rome&APPID=686aeb1eff8cb88780f2fbb1b51b06f8&units=metric"
+      );
+      let secondAPICall = fetch(
+        "http://api.openweathermap.org/data/2.5/weather?q=Moscow&APPID=686aeb1eff8cb88780f2fbb1b51b06f8&units=metric"
+      );
+      let thirdAPICall = fetch(
+        "http://api.openweathermap.org/data/2.5/weather?q=Beijing&APPID=686aeb1eff8cb88780f2fbb1b51b06f8&units=metric"
+      );
+      let fourAPICall = fetch(
+        "http://api.openweathermap.org/data/2.5/weather?q=London&APPID=686aeb1eff8cb88780f2fbb1b51b06f8&units=metric"
+      );
+
+      Promise.all([firstAPICall, secondAPICall, thirdAPICall, fourAPICall])
+        .then(values => Promise.all(values.map(value => value.json())))
+        .then(finalVals => {
+          commit("GET_WORLD_COUNTRIES", finalVals);
+        });
     }
   },
   getters: {
@@ -55,6 +79,9 @@ export default new Vuex.Store({
     },
     getErrorCode: state => {
       return state.errorCode;
+    },
+    getWorldCities: state => {
+      return state.worldCities;
     }
   },
   modules: {}
